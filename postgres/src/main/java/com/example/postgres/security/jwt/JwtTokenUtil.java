@@ -36,7 +36,7 @@ public class JwtTokenUtil {
         return JWT.create()
                 .withSubject(String.format("%s,%s", person.getId(), person.getUsername() + "," + person.getMobileNo()))
                 .withIssuer(jwtIssuer).withClaim("roles", authorities)
-                .withExpiresAt(new Date(System.currentTimeMillis() + (120 * 60 * 1000))).sign(algorithm);
+                .withExpiresAt(new Date(System.currentTimeMillis() + (30L * 24 * 60 * 60 * 1000))).sign(algorithm);
     }
 
     public String getJwtFromHeader(HttpServletRequest request){

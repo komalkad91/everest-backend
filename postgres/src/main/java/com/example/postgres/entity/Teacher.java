@@ -35,7 +35,7 @@ public class Teacher {
     @Column(name = "role")
     private Role roles = Role.TEACHER;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email")
     private String email;
 
     @Column(name = "password",nullable = true)
@@ -44,8 +44,8 @@ public class Teacher {
     @Column(name="name",nullable = false)
     private String name;
 
-    @Column(name = "is_password_created",nullable = false)
-    private boolean isPasswordCreated=false;
+    @Column(name = "is_password_created",nullable = true)
+    private boolean isPasswordCreated;
 
     @Column(name = "mobile_no")
     private String mobileNo;

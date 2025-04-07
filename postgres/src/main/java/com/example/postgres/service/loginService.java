@@ -71,8 +71,14 @@ public class loginService implements loginImpl {
     public Teacher checkIfTeacherExist(CreatePass passData){
         Teacher teacher1 = new Teacher();
 
+        try{
+            teacher1 = teacherRepo.findByEmail(passData.getEmail());
 
-        teacher1 = teacherRepo.findByEmail(passData.getEmail());
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         if (teacher1 == null) {
             throw new DataNotFound("Teacher not exist");
         };

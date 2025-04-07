@@ -1,5 +1,6 @@
 package com.example.postgres.Controller;
 
+import com.example.postgres.entity.Centers;
 import com.example.postgres.entity.LevelMarks;
 import com.example.postgres.entity.Student;
 import com.example.postgres.repository.CenterRepo;
@@ -35,14 +36,13 @@ public class StudentController {
         Student student1;
         if(studentData.getId() != null){
 
-            System.out.println(studentData.getMarks());
 
             Student existingStudent = studentRepo.findById(studentData.getId())
                     .orElseThrow(() -> new RuntimeException("Student not found"));
 
             student1 = Student.builder()
                     .id(existingStudent.getId())  // Keep the same ID
-                    .regId(studentData.getReg_id())
+                    .regId(studentData.getRegId())
                     .birtDate(studentData.getBirtDate())
                     .standard(studentData.getStandard())
                     .level(studentData.getLevel())
@@ -50,7 +50,7 @@ public class StudentController {
                     .address(studentData.getAddress())
                     .mobileNo(studentData.getMobileNo())
                     .email(studentData.getEmail())
-                    .isActive(true)
+                    //.isActive(true)
                     .center(existingStudent.getCenter())  // Retain existing center
                     .build();
 
@@ -66,7 +66,7 @@ public class StudentController {
         }else{
 
             student1 = Student.builder()
-                    .regId(studentData.getReg_id())
+                    .regId(studentData.getRegId())
                     .birtDate(studentData.getBirtDate())
                     .center(centerRepo.findById(studentData.getCenterId()).get())
                     .standard(studentData.getStandard())
@@ -75,7 +75,7 @@ public class StudentController {
                     .address(studentData.getAddress())
                     .mobileNo(studentData.getMobileNo())
                     .email(studentData.getEmail())
-                    .isActive(true)
+                   // .isActive(true)
                     .build();
 
 
@@ -93,25 +93,33 @@ public class StudentController {
     @GetMapping("/teacher/{teacherId}")
     public List<AllStudentRes> getAllStudents(@PathVariable Long teacherId){
         List<AllStudentRes>studentDataList = new ArrayList<>();
-        centerRepo.findByTeacher(teacherId).forEach(center->{
+        List<Centers>dummy = centerRepo.findByTeacher(teacherId);
+        try{
+            centerRepo.findByTeacher(teacherId).forEach(center->{
 
-            List<Student>studentList= studentRepo.findByCenterId(center.getId());
+                List<Student>studentList= studentRepo.findByCenterId(center.getId());
 
-            studentList.forEach(student ->{
-                AllStudentRes allStudentRes = new AllStudentRes();
-                allStudentRes.setLevel(student.getLevel());
-                allStudentRes.setId(student.getId());
-                allStudentRes.setReg_id(student.getRegId());
-                allStudentRes.setName(student.getName());
-                studentDataList.add(allStudentRes);
+                studentList.forEach(student ->{
+                    AllStudentRes allStudentRes = new AllStudentRes();
+                    allStudentRes.setLevel(student.getLevel());
+                    allStudentRes.setId(student.getId());
+                    allStudentRes.setReg_id(student.getRegId());
+                    allStudentRes.setName(student.getName());
+                    studentDataList.add(allStudentRes);
+
+
+                });
+
 
 
             });
 
+            return studentDataList;
 
-        });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
-        return studentDataList;
 
     }
 

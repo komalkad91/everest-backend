@@ -12,9 +12,9 @@ import java.util.List;
 public class StudentData {
 
     private Long id;
-     private LocalDate birtDate;
+     private String birtDate;
 
-    private Long reg_id;
+    private Long regId;
 
     private String name;
     private String mobileNo;

@@ -23,8 +23,26 @@ public class LevelMarks {
 
     private Integer marks;
 
+    private Integer l_f;
+
+    private Integer l_1;
+
+    private Integer l_2;
+
+    private Integer l_3;
+
+    private Integer l_4;
+
+    private Integer l_5;
+
+    private Integer l_6;
+
+    private Integer l_7;
+
+    private Integer l_8;
+
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
     private Student student;
 
 

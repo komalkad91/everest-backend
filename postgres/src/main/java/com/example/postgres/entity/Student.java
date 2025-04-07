@@ -27,13 +27,13 @@ public class Student {
 
     private Integer level;
 
-    private Boolean certificate;
+    private String certificate;
 
-    private LocalDate birtDate;
+    private String birtDate;
 
     private String standard;
 
-    private boolean isActive;
+    private String isActive;
 
     private String mobileNo;
 
@@ -47,8 +47,8 @@ public class Student {
     @JoinColumn(name= "center_id")
     private Centers center;
 
-    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
-    private List<LevelMarks> levelMarks;
+    @OneToOne(mappedBy = "student", fetch = FetchType.LAZY)
+    private LevelMarks levelMarks;
 
 
 
