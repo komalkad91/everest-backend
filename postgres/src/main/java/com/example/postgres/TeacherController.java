@@ -8,6 +8,7 @@ import com.example.postgres.model.TeacherRes;
 import com.example.postgres.repository.CenterRepo;
 import com.example.postgres.repository.TeacherRepo;
 import com.example.postgres.request.CreatePass;
+import com.example.postgres.request.UserNameData;
 import com.example.postgres.request.login;
 import com.example.postgres.request.TeacherData;
 import com.example.postgres.security.jwt.JwtTokenUtil;
@@ -26,7 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 
-
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -93,8 +94,8 @@ public class TeacherController {
         List<String>centersList =centerRepo.findByTeacherId(id);
 
         TeacherData teacher1= TeacherData.builder().address(teacher2.getAddress()).email(teacher2.getEmail()).userName(teacher2.getUsername())
-                .trainerTeacherId(teacher2.getTrainerTeacherId()).pin(teacher2.getPin()).birthDate(teacher2.getBirthDate()).qualification(teacher2.getQualification()).id(teacher2.getId()).
-                level(teacher2.getLevel()).mobileNo(teacher2.getMobileNo()).name(teacher2.getName()).trainerTeacherName(teacher2.getTrainerName()).
+                .trainerTeacherId(teacher2.getTrainerTeacherId()).pin(teacher2.getPin()).birthDate(LocalDate.parse(teacher2.getBirthdate())).qualification(teacher2.getQualification()).id(teacher2.getId()).
+                level(teacher2.getLevel()).mobileNo(teacher2.getMobile()).name(teacher2.getName()).trainerTeacherName(teacher2.getTrainerName()).
                 centers(centersList).build();
 
         return teacher1;
@@ -151,9 +152,9 @@ public class TeacherController {
     public String addNewTeacher(@RequestBody TeacherData teacher1){
         Teacher teacher2 = new Teacher();
         teacher2.setAddress(teacher1.getAddress());
-        teacher2.setBirthDate(teacher1.getBirthDate());
+        teacher2.setBirthdate(String.valueOf(teacher1.getBirthDate()));
         teacher2.setTrainer(repo.findById(teacher1.getTrainerTeacherId()).get());
-        teacher2.setMobileNo(teacher1.getMobileNo());
+        teacher2.setMobile(teacher1.getMobileNo());
         teacher2.setLevel(teacher1.getLevel());
         teacher2.setName(teacher1.getName());
         teacher2.setQualification(teacher1.getQualification());
@@ -227,6 +228,11 @@ public class TeacherController {
            return ResponseEntity.ok("Center not present in database");
        }
 
+
+    }
+
+    @PostMapping("/generateUserName")
+    public ResponseEntity<String> generateUserName(@RequestBody UserNameData){
 
     }
 

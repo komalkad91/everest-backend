@@ -47,8 +47,7 @@ public class Teacher {
     @Column(name = "is_password_created",nullable = true)
     private boolean isPasswordCreated;
 
-    @Column(name = "mobile_no")
-    private String mobileNo;
+    private String mobile;
 
     @Column(name = "address")
     private String address;
@@ -67,8 +66,8 @@ public class Teacher {
     @Column(name = "qualification")
     private String qualification;
 
-    @Column(name = "birth_date")
-    private LocalDate birthDate;
+//    @Column(name = "birth_date")
+//    private LocalDate birthDate;
 
 
     @Column(name = "level")
@@ -76,6 +75,11 @@ public class Teacher {
 
 
     private String centers;
+
+    private Long code;
+
+    @Column(name="birthdate")
+    private String birthdate;
 
     @OneToMany(mappedBy = "teacher",fetch = FetchType.LAZY)
     private List<Centers>centersList;
