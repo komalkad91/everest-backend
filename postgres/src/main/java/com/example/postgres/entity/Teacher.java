@@ -79,7 +79,7 @@ public class Teacher {
     private Long code;
 
     @Column(name="birthdate")
-    private String birthdate;
+    private LocalDate birthdate;
 
     @OneToMany(mappedBy = "teacher",fetch = FetchType.LAZY)
     private List<Centers>centersList;
@@ -94,6 +94,14 @@ public class Teacher {
     public String getTrainerName(){
         return (trainer!=null) ? trainer.getName() : null;
 
+    }
+
+    @JsonProperty("defaultCenter")
+    public String getDefaultCenter(){
+        if(centersList==null || centersList.isEmpty()){
+            return "No Center";
+        }
+       return  centersList.get(0).getName();
     }
 
 

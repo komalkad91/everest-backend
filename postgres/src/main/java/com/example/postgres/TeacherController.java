@@ -4,6 +4,7 @@ package com.example.postgres;
 import com.example.postgres.entity.Centers;
 import com.example.postgres.entity.Teacher;
 import com.example.postgres.exception.DataNotFound;
+import com.example.postgres.model.AllTeacherRes;
 import com.example.postgres.model.TeacherRes;
 import com.example.postgres.repository.CenterRepo;
 import com.example.postgres.repository.TeacherRepo;
@@ -75,14 +76,14 @@ public class TeacherController {
     }
 
     @GetMapping("/getAllteacher")
-    public List<TeacherRes> getAllteacher(){
-        List<TeacherRes>teacherResList = new ArrayList<>();
-        repo.findAllTeacher().forEach(obj->{
-           TeacherRes teacherRes = new TeacherRes();
-           System.out.println(obj[0]);
-           System.out.println(obj[1]);
-           teacherRes.setId((Long)obj[0]);
-           teacherRes.setName((String)obj[1]);
+    public List<AllTeacherRes> getAllteacher(){
+        List<AllTeacherRes>teacherResList = new ArrayList<>();
+        repo.findAll().forEach(obj->{
+           AllTeacherRes teacherRes = new AllTeacherRes();
+           teacherRes.setCode(obj.getCode());
+           teacherRes.setId(obj.getId());
+           teacherRes.setName(obj.getName());
+           teacherRes.setCenter(obj.getDefaultCenter());
            teacherResList.add(teacherRes);
        });
        return teacherResList;
@@ -94,7 +95,8 @@ public class TeacherController {
         List<String>centersList =centerRepo.findByTeacherId(id);
 
         TeacherData teacher1= TeacherData.builder().address(teacher2.getAddress()).email(teacher2.getEmail()).userName(teacher2.getUsername())
-                .trainerTeacherId(teacher2.getTrainerTeacherId()).pin(teacher2.getPin()).birthDate(LocalDate.parse(teacher2.getBirthdate())).qualification(teacher2.getQualification()).id(teacher2.getId()).
+                .trainerTeacherId(teacher2.getTrainerTeacherId()).pin(teacher2.getPin()).birthDate(teacher2.getBirthdate()).qualification(teacher2.getQualification()).
+                id(teacher2.getId()).teacherCode(teacher2.getCode()).
                 level(teacher2.getLevel()).mobileNo(teacher2.getMobile()).name(teacher2.getName()).trainerTeacherName(teacher2.getTrainerName()).
                 centers(centersList).build();
 
@@ -152,7 +154,7 @@ public class TeacherController {
     public String addNewTeacher(@RequestBody TeacherData teacher1){
         Teacher teacher2 = new Teacher();
         teacher2.setAddress(teacher1.getAddress());
-        teacher2.setBirthdate(String.valueOf(teacher1.getBirthDate()));
+        teacher2.setBirthdate(teacher1.getBirthDate());
         teacher2.setTrainer(repo.findById(teacher1.getTrainerTeacherId()).get());
         teacher2.setMobile(teacher1.getMobileNo());
         teacher2.setLevel(teacher1.getLevel());
@@ -188,18 +190,7 @@ public class TeacherController {
 
     @PostMapping("/editTeacher")
     public  String editTeacher(@RequestBody TeacherData teacher1){
-//        Teacher teacher2 = repo.findById(teacher1.getId()).get();
-//        teacher2.setAddress(teacher1.getAddress());
-//        teacher2.setBirthDate(teacher1.getBirthDate());
-//        teacher2.setTrainer(repo.findById(teacher1.getTrainerTeacherId()).get());
-//        teacher2.setMobileNo(teacher1.getMobileNo());
-//        teacher2.setLevel(teacher1.getLevel());
-//        teacher2.setName(teacher1.getName());
-//        teacher2.setQualification(teacher1.getQualification());
-//        teacher2.setEmail(teacher1.getEmail());
-//        teacher2.setPin(teacher1.getPin());
-//        //teacher2.setCenters(teacher1.getCenters());
-//        repo.save(teacher2);
+
         teacherService.updateTeacher(teacher1.getId(), teacher1);
 
 
@@ -208,14 +199,7 @@ public class TeacherController {
 
     }
 
-//    @GetMapping("/checkAuthentication")
-//    public ResponseEntity<?> checkAuthentication(HttpServletRequest request) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication != null && authentication.isAuthenticated()) {
-//            return ResponseEntity.ok().body("authenticated");
-//        }
-//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("not_authenticated");
-//    }
+
 
     @PostMapping("/removeCenter")
     public ResponseEntity<String> removeCenter(@RequestParam Long teacherId,@RequestBody String center){
@@ -228,11 +212,6 @@ public class TeacherController {
            return ResponseEntity.ok("Center not present in database");
        }
 
-
-    }
-
-    @PostMapping("/generateUserName")
-    public ResponseEntity<String> generateUserName(@RequestBody UserNameData){
 
     }
 

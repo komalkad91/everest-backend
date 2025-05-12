@@ -47,7 +47,19 @@ public class TeacherService implements TeacherImpl {
             teacher.setTrainer(repo.findById(teacher1.getTrainerTeacherId()).get());
         }
         if(teacher1.getBirthDate() != null){
-            teacher.setBirthDate(teacher1.getBirthDate());
+            teacher.setBirthdate(teacher1.getBirthDate());
+        }
+
+        if(teacher1.getTeacherCode() != null){
+            teacher.setCode(teacher.getCode());
+        }
+
+        if(teacher1.getQualification()!= null){
+            teacher.setQualification(teacher1.getQualification());
+        }
+
+        if(teacher1.getAddress()!=null){
+            teacher.setAddress(teacher1.getAddress());
         }
         if(teacher1.getEmail() != null){
             teacher.setEmail(teacher1.getEmail());
@@ -58,7 +70,7 @@ public class TeacherService implements TeacherImpl {
         }
 
         if(teacher1.getMobileNo() != null){
-            teacher.setMobileNo(teacher1.getMobileNo());
+            teacher.setMobile(teacher1.getMobileNo());
         }
 
         if(teacher1.getRemovedCenters()!=null){

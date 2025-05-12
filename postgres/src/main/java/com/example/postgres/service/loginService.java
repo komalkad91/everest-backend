@@ -72,7 +72,7 @@ public class loginService implements loginImpl {
         Teacher teacher1 = new Teacher();
 
         try{
-            teacher1 = teacherRepo.findByEmail(passData.getEmail());
+            teacher1 = teacherRepo.findByUsername(passData.getUsername());
 
 
         } catch (Exception e) {

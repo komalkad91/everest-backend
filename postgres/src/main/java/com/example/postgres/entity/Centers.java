@@ -26,7 +26,7 @@ public class Centers {
 
     private String name;
 
-    @OneToMany
+    @OneToMany(mappedBy = "center", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Student> studentList;
 

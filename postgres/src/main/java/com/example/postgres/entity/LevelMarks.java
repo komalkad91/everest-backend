@@ -41,8 +41,8 @@ public class LevelMarks {
 
     private Integer l_8;
 
-    @JsonIgnore
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne
+    @JoinColumn(name = "student_id")
     private Student student;
 
 

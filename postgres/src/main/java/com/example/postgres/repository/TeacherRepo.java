@@ -14,8 +14,7 @@ public interface TeacherRepo extends JpaRepository<Teacher,Long> {
 
 
 
- @Query(value = "Select t.id,t.name from teachers t",nativeQuery = true)
- List<Object[]>findAllTeacher();
+ List<Teacher> findAll();
 
 
 

@@ -34,7 +34,7 @@ public class JwtTokenUtil {
 
         authorities.add(person.getRoles().name());
         return JWT.create()
-                .withSubject(String.format("%s,%s", person.getId(), person.getUsername() + "," + person.getMobileNo()))
+                .withSubject(String.format("%s,%s", person.getId(), person.getUsername() + "," + person.getMobile()))
                 .withIssuer(jwtIssuer).withClaim("roles", authorities)
                 .withExpiresAt(new Date(System.currentTimeMillis() + (30L * 24 * 60 * 60 * 1000))).sign(algorithm);
     }
@@ -64,7 +64,7 @@ public class JwtTokenUtil {
         Algorithm algorithm = Algorithm.HMAC512(jwtSecret.getBytes());
 
         return JWT.create()
-                .withSubject(String.format("%s,%s", person.getId(), person.getEmail() + "," + person.getMobileNo()))
+                .withSubject(String.format("%s,%s", person.getId(), person.getEmail() + "," + person.getMobile()))
                 .withIssuer(jwtIssuer).withExpiresAt(new Date(System.currentTimeMillis() + (180 * 60 * 1000)))
                 .sign(algorithm);
     }

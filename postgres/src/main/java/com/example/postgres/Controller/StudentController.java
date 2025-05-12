@@ -1,5 +1,6 @@
 package com.example.postgres.Controller;
 
+import com.example.postgres.Projection.AllStudentProjection;
 import com.example.postgres.entity.Centers;
 import com.example.postgres.entity.LevelMarks;
 import com.example.postgres.entity.Student;
@@ -9,7 +10,11 @@ import com.example.postgres.repository.StudentRepo;
 import com.example.postgres.request.AllStudentRes;
 import com.example.postgres.request.StudentData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +46,7 @@ public class StudentController {
                     .orElseThrow(() -> new RuntimeException("Student not found"));
 
             student1 = Student.builder()
-                    .id(existingStudent.getId())  // Keep the same ID
+                    .id(existingStudent.getId())
                     .regId(studentData.getRegId())
                     .birtDate(studentData.getBirtDate())
                     .standard(studentData.getStandard())
@@ -51,7 +56,7 @@ public class StudentController {
                     .mobileNo(studentData.getMobileNo())
                     .email(studentData.getEmail())
                     //.isActive(true)
-                    .center(existingStudent.getCenter())  // Retain existing center
+                    .center(existingStudent.getCenter())
                     .build();
 
 
@@ -123,22 +128,13 @@ public class StudentController {
 
     }
 
+
     @GetMapping("/getAll")
-    public List<AllStudentRes> getAllStudents(){
-        List<Student>studentList = studentRepo.findAll();
-        List<AllStudentRes>studentDataList = new ArrayList<>();
-        studentList.forEach(student ->{
-            AllStudentRes allStudentRes = new AllStudentRes();
-            allStudentRes.setName(student.getName());
-            allStudentRes.setId(student.getId());
-            allStudentRes.setReg_id(student.getRegId());
-            allStudentRes.setLevel(student.getLevel());
-            studentDataList.add(allStudentRes);
-        });
+    public Page<AllStudentProjection> getAllStudents( @RequestParam(defaultValue = "0") int page,
+                                                      @RequestParam(defaultValue = "22000") int size){
+        Pageable pageable = PageRequest.of(page,size);
+        return studentRepo.findAllProjected(pageable);
 
-
-
-        return studentDataList;
 
     }
 

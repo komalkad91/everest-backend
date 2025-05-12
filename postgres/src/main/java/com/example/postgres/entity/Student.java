@@ -48,7 +48,10 @@ public class Student {
     @JoinColumn(name= "center_id")
     private Centers center;
 
-    @OneToOne(mappedBy = "student", fetch = FetchType.LAZY)
+
+
+    @OneToOne(mappedBy = "student", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private LevelMarks levelMarks;
 
 
