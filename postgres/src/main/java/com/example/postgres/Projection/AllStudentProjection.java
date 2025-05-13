@@ -5,4 +5,5 @@ public interface AllStudentProjection {
     String getName();
     Long getRegId();
     Integer getLevel();
+    String getTeacher();
 }

@@ -27,6 +27,7 @@ public class StudentData {
     private String email;
     private Integer marks;
     private List<Integer>levelMarks;
+    private Long assignTeacher;
 
 
 

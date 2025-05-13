@@ -4,9 +4,11 @@ import com.example.postgres.Projection.AllStudentProjection;
 import com.example.postgres.entity.Centers;
 import com.example.postgres.entity.LevelMarks;
 import com.example.postgres.entity.Student;
+import com.example.postgres.entity.Teacher;
 import com.example.postgres.repository.CenterRepo;
 import com.example.postgres.repository.LevelRepo;
 import com.example.postgres.repository.StudentRepo;
+import com.example.postgres.repository.TeacherRepo;
 import com.example.postgres.request.AllStudentRes;
 import com.example.postgres.request.StudentData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,9 @@ public class StudentController {
     @Autowired
     LevelRepo levelRepo;
 
+    @Autowired
+    TeacherRepo teacherRepo;
+
 
 
     @PostMapping("/add/{teacherId}")
@@ -45,6 +50,7 @@ public class StudentController {
             Student existingStudent = studentRepo.findById(studentData.getId())
                     .orElseThrow(() -> new RuntimeException("Student not found"));
 
+
             student1 = Student.builder()
                     .id(existingStudent.getId())
                     .regId(studentData.getRegId())
@@ -55,9 +61,13 @@ public class StudentController {
                     .address(studentData.getAddress())
                     .mobileNo(studentData.getMobileNo())
                     .email(studentData.getEmail())
-                    //.isActive(true)
                     .center(existingStudent.getCenter())
                     .build();
+
+            if (studentData.getAssignTeacher()!=null){
+                Teacher teacher = teacherRepo.findById(studentData.getAssignTeacher()).get();
+                student1.setCenter(teacher.getCentersList().get(0));
+            }
 
 
             if(studentData.getMarks()!= null && studentData.getMarks()>80){
@@ -70,6 +80,7 @@ public class StudentController {
 
         }else{
 
+
             student1 = Student.builder()
                     .regId(studentData.getRegId())
                     .birtDate(studentData.getBirtDate())
@@ -80,6 +91,7 @@ public class StudentController {
                     .address(studentData.getAddress())
                     .mobileNo(studentData.getMobileNo())
                     .email(studentData.getEmail())
+
                    // .isActive(true)
                     .build();
 

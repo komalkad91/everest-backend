@@ -14,7 +14,19 @@ public interface StudentRepo extends JpaRepository<Student,Long> {
     List<Student> findByCenterId(Long id);
     Optional<Student> findByRegId(Long regId);
 
-    @Query("SELECT s.id AS id, s.name AS name, s.regId AS regId, s.level AS level FROM Student s")
+    @Query(value = """
+    SELECT 
+        s.id AS id, 
+        COALESCE(s.name,'NO NAME') AS name, 
+        s.reg_id AS regId, 
+        s.level AS level, 
+        COALESCE(tc.name,'NOT ASSIGNED') AS teacher 
+    FROM student s
+    LEFT JOIN centers ct ON ct.id = s.center_id
+    LEFT JOIN teachers tc ON tc.id = ct.teacher_id
+    """,
+            nativeQuery = true)
+
     Page<AllStudentProjection> findAllProjected(Pageable pageable);
 
 
