@@ -19,7 +19,9 @@ import org.springframework.data.domain.Pageable;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -110,7 +112,6 @@ public class StudentController {
     @GetMapping("/teacher/{teacherId}")
     public List<AllStudentRes> getAllStudents(@PathVariable Long teacherId){
         List<AllStudentRes>studentDataList = new ArrayList<>();
-        List<Centers>dummy = centerRepo.findByTeacher(teacherId);
         try{
             centerRepo.findByTeacher(teacherId).forEach(center->{
 
@@ -148,6 +149,20 @@ public class StudentController {
         return studentRepo.findAllProjected(pageable);
 
 
+    }
+
+    @GetMapping("/totalCount")
+    public long getTotalCount(@RequestParam Long teacherId){
+       Teacher teacher = teacherRepo.findById(teacherId).get();
+       if(teacher.getRoles().equals("TEACHER")){
+        return   studentRepo.findTotalStudents(teacherId);
+
+
+       }else{
+          return studentRepo.count();
+       }
+
+        
     }
 
 

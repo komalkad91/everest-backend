@@ -20,6 +20,8 @@ public interface TeacherRepo extends JpaRepository<Teacher,Long> {
 
 
 
+
+
 }
 
 

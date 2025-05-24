@@ -40,6 +40,5 @@ public class RequestController {
 
 
         return repo.findByTeacherId(teacherId);
-        // Assuming RequestRepo returns an array of requests
     }
 }

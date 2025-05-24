@@ -30,6 +30,24 @@ public interface StudentRepo extends JpaRepository<Student,Long> {
     Page<AllStudentProjection> findAllProjected(Pageable pageable);
 
 
+    @Query(value = """
+            select count(st.id) from student as st
+            join centers ct on ct.id = st.center_id
+            join teachers tc on tc.id = ct.teacher_id
+            where tc.id = :teacherId
+            """,nativeQuery = true)
+    long findTotalStudents(Long teacherId);
+
+    long count();
+
+
+
+//    select count(st.id) from student as st
+//    join centers ct on ct.id = st.center_id
+//    join teachers tc on tc.id = ct.teacher_id
+//    where tc.id = 1
+
+
 
 
 
