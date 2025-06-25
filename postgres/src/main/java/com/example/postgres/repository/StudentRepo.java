@@ -24,6 +24,7 @@ public interface StudentRepo extends JpaRepository<Student,Long> {
     FROM student s
     LEFT JOIN centers ct ON ct.id = s.center_id
     LEFT JOIN teachers tc ON tc.id = ct.teacher_id
+    ORDER BY s.reg_id DESC
     """,
             nativeQuery = true)
 

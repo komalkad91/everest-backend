@@ -1,5 +1,6 @@
 package com.example.postgres.entity;
 
+import com.example.postgres.enums.Type;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,7 +23,7 @@ public class Student {
 
     private String name;
 
-    @Column(name = "reg_id")
+    @Column(name = "reg_id", unique = true, updatable = false)
     private Long regId;
 
     private Integer level;
@@ -48,7 +49,7 @@ public class Student {
     @JoinColumn(name= "center_id")
     private Centers center;
 
-
+    private Type type;
 
     @OneToOne(mappedBy = "student", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore

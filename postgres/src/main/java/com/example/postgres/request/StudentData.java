@@ -1,6 +1,7 @@
 package com.example.postgres.request;
 
 import com.example.postgres.entity.Centers;
+import com.example.postgres.enums.Type;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,6 +29,7 @@ public class StudentData {
     private Integer marks;
     private List<Integer>levelMarks;
     private Long assignTeacher;
+    private Type type;
 
 
 

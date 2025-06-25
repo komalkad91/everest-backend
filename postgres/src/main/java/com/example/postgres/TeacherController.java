@@ -94,11 +94,22 @@ public class TeacherController {
         Teacher teacher2= repo.findById(id).get();
         List<String>centersList =centerRepo.findByTeacherId(id);
 
-        TeacherData teacher1= TeacherData.builder().address(teacher2.getAddress()).email(teacher2.getEmail()).userName(teacher2.getUsername())
-                .trainerTeacherId(teacher2.getTrainerTeacherId()).pin(teacher2.getPin()).birthDate(teacher2.getBirthdate()).qualification(teacher2.getQualification()).
-                id(teacher2.getId()).teacherCode(teacher2.getCode()).
-                level(teacher2.getLevel()).mobileNo(teacher2.getMobile()).name(teacher2.getName()).trainerTeacherName(teacher2.getTrainerName()).
-                centers(centersList).build();
+        TeacherData teacher1 = TeacherData.builder()
+                .address(teacher2.getAddress() != null ? teacher2.getAddress() : "")
+                .email(teacher2.getEmail() != null ? teacher2.getEmail() : "")
+                .userName(teacher2.getUsername() != null ? teacher2.getUsername() : "")
+                .trainerTeacherId(teacher2.getTrainerTeacherId())
+                .pin(teacher2.getPin() !=null ? teacher2.getPin() :"")
+                .birthDate(teacher2.getBirthdate())
+                .qualification(teacher2.getQualification() != null ? teacher2.getQualification() : "")
+                .id(teacher2.getId())
+                .teacherCode(teacher2.getCode())
+                .level(teacher2.getLevel() != null ? teacher2.getLevel() : 0)
+                .mobileNo(teacher2.getMobile() != null ? teacher2.getMobile() : "")
+                .name(teacher2.getName() != null ? teacher2.getName() : "")
+                .trainerTeacherName(teacher2.getTrainerName() != null ? teacher2.getTrainerName() : "")
+                .centers(centersList != null ? centersList : new ArrayList<>())
+                .build();
 
         return teacher1;
     }
@@ -107,7 +118,7 @@ public class TeacherController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<TeacherRes>login(@RequestBody login log){
+    public ResponseEntity<?> login(@RequestBody login log){
 
         TeacherRes teacherRes = new TeacherRes();
         try {
@@ -116,19 +127,20 @@ public class TeacherController {
 
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
-            User userDetails = (User) authentication.getPrincipal();
+            //User userDetails = (User) authentication.getPrincipal();
             Teacher person = repo.findByUsername(log.getUsername());
             String accessToken = "";
 
             if(person != null){
 
               accessToken = jwtTokenUtil.generateAccessToken(person);
-              String refreshToken = jwtTokenUtil.generateRefreshToken(person);
-
 
             }
-
-
+            if(person.getIsLoggedIn()){
+                throw new RuntimeException("User already logged in from another device.");
+            }
+            person.setIsLoggedIn(true);
+            repo.save(person);
             teacherRes.setName(person.getName());
             teacherRes.setToken(accessToken);
             teacherRes.setId(person.getId());
@@ -140,10 +152,31 @@ public class TeacherController {
         } catch (AuthenticationException e) {
             teacherRes.setToken(e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(teacherRes);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
 
 
 
+    }
+
+    @PostMapping("/api/out")
+    public ResponseEntity<?> logout(@RequestParam long teacherId){
+
+        try{
+            Optional<Teacher> optionalTeacher = repo.findById(teacherId);
+            if (optionalTeacher.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Teacher not found");
+            }
+            Teacher teacher = optionalTeacher.get();
+            teacher.setIsLoggedIn(false);
+            repo.save(teacher);
+            return ResponseEntity.status(HttpStatus.OK).body("Teacher logout successfully");
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Something went wrong: " + e.getMessage());
+        }
     }
 
 
@@ -162,6 +195,8 @@ public class TeacherController {
         teacher2.setQualification(teacher1.getQualification());
         teacher2.setEmail(teacher1.getEmail());
         teacher2.setPin(teacher1.getPin());
+        teacher2.setCode(teacher1.getTeacherCode());
+        teacher2.setId(null);
 
         Teacher teacher3 =repo.save(teacher2);
 

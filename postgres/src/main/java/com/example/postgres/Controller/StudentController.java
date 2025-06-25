@@ -11,17 +11,14 @@ import com.example.postgres.repository.StudentRepo;
 import com.example.postgres.repository.TeacherRepo;
 import com.example.postgres.request.AllStudentRes;
 import com.example.postgres.request.StudentData;
+import com.example.postgres.service.impl.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
-
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController
@@ -40,6 +37,9 @@ public class StudentController {
 
     @Autowired
     TeacherRepo teacherRepo;
+
+    @Autowired
+    StudentService studentService;
 
 
 
@@ -64,6 +64,7 @@ public class StudentController {
                     .mobileNo(studentData.getMobileNo())
                     .email(studentData.getEmail())
                     .center(existingStudent.getCenter())
+                    .type(studentData.getType())
                     .build();
 
             if (studentData.getAssignTeacher()!=null){
@@ -84,7 +85,7 @@ public class StudentController {
 
 
             student1 = Student.builder()
-                    .regId(studentData.getRegId())
+                    .regId(studentService.getNextRegId())
                     .birtDate(studentData.getBirtDate())
                     .center(centerRepo.findById(studentData.getCenterId()).get())
                     .standard(studentData.getStandard())
@@ -93,8 +94,7 @@ public class StudentController {
                     .address(studentData.getAddress())
                     .mobileNo(studentData.getMobileNo())
                     .email(studentData.getEmail())
-
-                   // .isActive(true)
+                    .type(studentData.getType())
                     .build();
 
 
@@ -112,6 +112,7 @@ public class StudentController {
     @GetMapping("/teacher/{teacherId}")
     public List<AllStudentRes> getAllStudents(@PathVariable Long teacherId){
         List<AllStudentRes>studentDataList = new ArrayList<>();
+        Teacher teacher = teacherRepo.findById(teacherId).get();
         try{
             centerRepo.findByTeacher(teacherId).forEach(center->{
 
@@ -121,8 +122,9 @@ public class StudentController {
                     AllStudentRes allStudentRes = new AllStudentRes();
                     allStudentRes.setLevel(student.getLevel());
                     allStudentRes.setId(student.getId());
-                    allStudentRes.setReg_id(student.getRegId());
+                    allStudentRes.setRegId(student.getRegId());
                     allStudentRes.setName(student.getName());
+                    allStudentRes.setTeacher(teacher.getName());
                     studentDataList.add(allStudentRes);
 
 
@@ -162,8 +164,11 @@ public class StudentController {
           return studentRepo.count();
        }
 
-        
+
     }
+
+
+
 
 
 

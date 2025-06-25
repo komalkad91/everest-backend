@@ -8,7 +8,8 @@ import lombok.Setter;
 @Setter
 public class AllStudentRes {
     private Long id;
-    private Long reg_id;
+    private Long regId;
     private Integer level;
+    private String teacher;
     private String name;
 }

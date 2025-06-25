@@ -84,6 +84,10 @@ public class Teacher {
     @OneToMany(mappedBy = "teacher",fetch = FetchType.LAZY)
     private List<Centers>centersList;
 
+    @Column(name = "is_logged_in")
+    private Boolean isLoggedIn = false;
+
+
     @JsonProperty("trainerId")
    public Long getTrainerTeacherId(){
         return (trainer!=null) ? trainer.getId() : null;
