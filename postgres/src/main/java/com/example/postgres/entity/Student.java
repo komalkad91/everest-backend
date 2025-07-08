@@ -51,8 +51,7 @@ public class Student {
 
     private Type type;
 
-    @OneToOne(mappedBy = "student", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @OneToOne(mappedBy = "student", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private LevelMarks levelMarks;
 
 

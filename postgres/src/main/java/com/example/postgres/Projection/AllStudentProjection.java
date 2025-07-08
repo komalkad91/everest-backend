@@ -6,4 +6,5 @@ public interface AllStudentProjection {
     Long getRegId();
     Integer getLevel();
     String getTeacher();
+    String getBirthDate();
 }

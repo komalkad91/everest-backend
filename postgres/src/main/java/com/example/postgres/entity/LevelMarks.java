@@ -41,8 +41,10 @@ public class LevelMarks {
 
     private Integer l_8;
 
+
     @OneToOne
     @JoinColumn(name = "student_id")
+    @JsonIgnore
     private Student student;
 
 

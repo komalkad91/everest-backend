@@ -20,6 +20,7 @@ public interface StudentRepo extends JpaRepository<Student,Long> {
         COALESCE(s.name,'NO NAME') AS name, 
         s.reg_id AS regId, 
         s.level AS level, 
+         s.birt_date As birthDate,
         COALESCE(tc.name,'NOT ASSIGNED') AS teacher 
     FROM student s
     LEFT JOIN centers ct ON ct.id = s.center_id

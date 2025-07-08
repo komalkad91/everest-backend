@@ -44,7 +44,7 @@ public class StudentController {
 
 
     @PostMapping("/add/{teacherId}")
-    public Student addStudent(@PathVariable Long teacherId, @RequestBody StudentData studentData){
+    public void addStudent(@PathVariable Long teacherId, @RequestBody StudentData studentData){
         Student student1;
         if(studentData.getId() != null){
 
@@ -58,7 +58,7 @@ public class StudentController {
                     .regId(studentData.getRegId())
                     .birtDate(studentData.getBirtDate())
                     .standard(studentData.getStandard())
-                    .level(studentData.getLevel())
+                    .level(studentData.getLevel()+1)
                     .name(studentData.getName())
                     .address(studentData.getAddress())
                     .mobileNo(studentData.getMobileNo())
@@ -72,13 +72,33 @@ public class StudentController {
                 student1.setCenter(teacher.getCentersList().get(0));
             }
 
-
-            if(studentData.getMarks()!= null && studentData.getMarks()>80){
-                LevelMarks lm = LevelMarks.builder().level(student1.getLevel()-1).marks(studentData.getMarks())
-                        .student(student1).
-                        build();
-                levelRepo.save(lm);
+            int level = studentData.getLevel();
+            Integer marks = studentData.getMarks();
+            LevelMarks lm = existingStudent.getLevelMarks();
+            if (lm == null) {
+                lm = new LevelMarks();
+                lm.setStudent(existingStudent);
             }
+            if (marks != null && marks > 80) {
+                switch (level) {
+                    case 0: lm.setL_f(marks); break;
+                    case 1: lm.setL_1(marks); break;
+                    case 2: lm.setL_2(marks); break;
+                    case 3: lm.setL_3(marks); break;
+                    case 4: lm.setL_4(marks); break;
+                    case 5: lm.setL_5(marks); break;
+                    case 6: lm.setL_6(marks); break;
+                    case 7: lm.setL_7(marks); break;
+                    case 8: lm.setL_8(marks); break;
+                    default: break;
+                }
+                student1.setLevelMarks(lm); // set the level marks back to student
+            }
+                studentRepo.save(student1);
+
+
+//            levelRepo.save(lm);
+
 
 
         }else{
@@ -97,12 +117,36 @@ public class StudentController {
                     .type(studentData.getType())
                     .build();
 
+            int level = student1.getLevel();
+            Integer marks = studentData.getMarks();
+            LevelMarks lm = new LevelMarks();
+            lm.setStudent(student1);
+            if (marks != null && marks > 80) {
+                switch (level) {
+                    case 1: lm.setL_f(marks); break;
+                    case 2: lm.setL_1(marks); break;
+                    case 3: lm.setL_2(marks); break;
+                    case 4: lm.setL_3(marks); break;
+                    case 5: lm.setL_4(marks); break;
+                    case 6: lm.setL_5(marks); break;
+                    case 7: lm.setL_6(marks); break;
+                    case 8: lm.setL_7(marks); break;
+                    case 9: lm.setL_8(marks); break;
+                    default: break;
+                }
+                student1.setLevelMarks(lm); // set the level marks back to student
+            }
+
+            studentRepo.save(student1);
+
+
+
 
 
 
 
         }
-        return studentRepo.save(student1);
+        return;
     }
 
 
@@ -124,6 +168,7 @@ public class StudentController {
                     allStudentRes.setId(student.getId());
                     allStudentRes.setRegId(student.getRegId());
                     allStudentRes.setName(student.getName());
+                    allStudentRes.setBirthDate(student.getBirtDate());
                     allStudentRes.setTeacher(teacher.getName());
                     studentDataList.add(allStudentRes);
 
@@ -170,9 +215,6 @@ public class StudentController {
 
 
 
-
-
-
     @GetMapping("/detail/{studentId}")
     public Student getStudentDetail(@PathVariable Long studentId){
         Student student = studentRepo.findById(studentId).get();
@@ -181,7 +223,6 @@ public class StudentController {
 
 
     }
-
 
 
 }

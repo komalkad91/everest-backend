@@ -26,8 +26,13 @@ public class Centers {
 
     private String name;
 
-    @OneToMany(mappedBy = "center", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
+    @OneToMany(mappedBy = "center", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Student> studentList;
+
+//    public Long getTeacherId(){
+//        return teacher.getId();
+//    }
 
 }

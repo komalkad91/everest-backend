@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface loginImpl {
 
-     void savePassword(CreatePass log);
+     void savePassword();
 
      ResponseEntity<String> logInUSer(login log);
 }

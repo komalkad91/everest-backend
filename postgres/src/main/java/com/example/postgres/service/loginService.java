@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Service
 public class loginService implements loginImpl {
@@ -25,14 +27,30 @@ public class loginService implements loginImpl {
 
     @Override
     @Transactional
-    public void  savePassword(CreatePass log) {
+    public void  savePassword() {
+        List<Teacher> teachers = teacherRepo.findAll();
+        for (Teacher teacher : teachers) {
 
-           Teacher teacher1 = checkIfTeacherExist(log);
-           String decodedPassword = passwordEncoder.encode(log.getPassword());
-           teacher1.setUsername(log.getUsername());
-           teacher1.setPassword(decodedPassword);
-           teacher1.setPasswordCreated(true);
-           teacherRepo.save(teacher1);
+            if (teacher.getName() != null && teacher.getCode() != null) {
+                String rawPassword = teacher.getPassword();
+                String encodedPassword = passwordEncoder.encode(rawPassword);
+
+                teacher.setUsername("TEACHER" + teacher.getCode());
+                teacher.setPassword(encodedPassword);
+                teacher.setPasswordCreated(true);
+
+                teacherRepo.save(teacher);
+            }
+        }
+
+
+//
+//        Teacher teacher1 = checkIfTeacherExist(log);
+//           String decodedPassword = passwordEncoder.encode(log.getPassword());
+//           teacher1.setUsername(log.getUsername());
+//           teacher1.setPassword(decodedPassword);
+//           teacher1.setPasswordCreated(true);
+//           teacherRepo.save(teacher1);
 
 
 

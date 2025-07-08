@@ -68,9 +68,9 @@ public class TeacherController {
 
     @PostMapping("/createPassword")
     @CrossOrigin({"http://localhost:3000", "https://everst-abacus.cloudjiffy.net/"})
-    public ResponseEntity<String> createPassword(@RequestBody CreatePass log) throws DataNotFound{
+    public ResponseEntity<String> createPassword() throws DataNotFound{
 
-            LoginService.savePassword(log);
+            LoginService.savePassword();
             return  ResponseEntity.ok("done");
 
     }
@@ -136,9 +136,9 @@ public class TeacherController {
               accessToken = jwtTokenUtil.generateAccessToken(person);
 
             }
-            if(person.getIsLoggedIn()){
-                throw new RuntimeException("User already logged in from another device.");
-            }
+//            if(person.getIsLoggedIn()){
+//                throw new RuntimeException("User already logged in from another device.");
+//            }
             person.setIsLoggedIn(true);
             repo.save(person);
             teacherRes.setName(person.getName());
@@ -232,6 +232,12 @@ public class TeacherController {
         return "Success";
 
 
+    }
+
+    @GetMapping("/getAllCenters")
+    public List<Centers> getAllCenters(@RequestParam Long teacherId){
+        List<Centers> centersList = centerRepo.findByTeacher(teacherId);
+        return centersList;
     }
 
 
