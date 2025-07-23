@@ -1,6 +1,7 @@
 package com.example.postgres.Projection;
 
 public interface AllStudentProjection {
+    Integer getSrNo();
     Long getId();
     String getName();
     Long getRegId();

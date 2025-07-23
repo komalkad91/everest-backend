@@ -24,7 +24,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         Teacher teacher = teacherRepo.findByUsername(username);
 
-
         return new UsernamePasswordAuthenticationToken(
                 teacher,
                 password,

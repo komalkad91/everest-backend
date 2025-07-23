@@ -26,6 +26,7 @@ public class Student {
     @Column(name = "reg_id", unique = true, updatable = false)
     private Long regId;
 
+    @JsonIgnore
     private Integer level;
 
     private String certificate;

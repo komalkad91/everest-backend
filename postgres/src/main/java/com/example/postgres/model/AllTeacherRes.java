@@ -11,4 +11,5 @@ public class AllTeacherRes {
     public String name;
     public String center;
     public Long code;
+    public long count;
 }

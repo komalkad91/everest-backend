@@ -4,5 +4,5 @@ import com.example.postgres.request.TeacherData;
 import org.springframework.http.ResponseEntity;
 
 public interface TeacherImpl {
-    public ResponseEntity<Object> updateTeacher(Long id, TeacherData teacher1);
+    public ResponseEntity<String> updateTeacher(Long id, TeacherData teacher1);
 }

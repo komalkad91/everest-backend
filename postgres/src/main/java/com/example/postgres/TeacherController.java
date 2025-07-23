@@ -2,11 +2,14 @@ package com.example.postgres;
 
 
 import com.example.postgres.entity.Centers;
+import com.example.postgres.entity.Pass;
 import com.example.postgres.entity.Teacher;
 import com.example.postgres.exception.DataNotFound;
 import com.example.postgres.model.AllTeacherRes;
 import com.example.postgres.model.TeacherRes;
 import com.example.postgres.repository.CenterRepo;
+import com.example.postgres.repository.PasswordRepo;
+import com.example.postgres.repository.StudentRepo;
 import com.example.postgres.repository.TeacherRepo;
 import com.example.postgres.request.CreatePass;
 import com.example.postgres.request.UserNameData;
@@ -61,6 +64,12 @@ public class TeacherController {
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
+    @Autowired
+    PasswordRepo passwordRepo;
+
+    @Autowired
+    StudentRepo studentRepo;
+
     @PostMapping("/addTeacher")
     public void addTeacher(@RequestBody Teacher teacher) {
         repo.save(teacher);
@@ -91,6 +100,7 @@ public class TeacherController {
 
     @GetMapping("/getTeacher")
     public TeacherData getTeacher(@RequestParam Long id){
+
         Teacher teacher2= repo.findById(id).get();
         List<String>centersList =centerRepo.findByTeacherId(id);
 
@@ -109,6 +119,7 @@ public class TeacherController {
                 .name(teacher2.getName() != null ? teacher2.getName() : "")
                 .trainerTeacherName(teacher2.getTrainerName() != null ? teacher2.getTrainerName() : "")
                 .centers(centersList != null ? centersList : new ArrayList<>())
+                .studentCount(studentRepo.findTotalStudents(id))
                 .build();
 
         return teacher1;
@@ -184,8 +195,13 @@ public class TeacherController {
 
 
     @PostMapping("/addNewTeacher")
-    public String addNewTeacher(@RequestBody TeacherData teacher1){
+    public ResponseEntity<String> addNewTeacher(@RequestBody TeacherData teacher1){
+        boolean codeExists = repo.existsByCode(teacher1.getTeacherCode());
+        if (codeExists) {
+            return ResponseEntity.badRequest().body("Teacher code already exists");
+        }
         Teacher teacher2 = new Teacher();
+
         teacher2.setAddress(teacher1.getAddress());
         teacher2.setBirthdate(teacher1.getBirthDate());
         teacher2.setTrainer(repo.findById(teacher1.getTrainerTeacherId()).get());
@@ -196,6 +212,9 @@ public class TeacherController {
         teacher2.setEmail(teacher1.getEmail());
         teacher2.setPin(teacher1.getPin());
         teacher2.setCode(teacher1.getTeacherCode());
+        teacher2.setPassword(passwordEncoder.encode(teacher1.getPassword()));
+        teacher2.setUsername("TEACHER"+teacher1.getTeacherCode());
+
         teacher2.setId(null);
 
         Teacher teacher3 =repo.save(teacher2);
@@ -204,7 +223,6 @@ public class TeacherController {
                 .map(centerName -> {
                     Centers center = new Centers();
                     center.setName(centerName);
-
                     center.setTeacher(teacher3);
                     centerRepo.save(center);
                     return center;
@@ -212,24 +230,25 @@ public class TeacherController {
                 .collect(Collectors.toList());
         teacher3.setCentersList(centers);
         repo.save(teacher3);
-
-        ;
+        Pass pass = new Pass();
+        pass.setCode(teacher3.getCode());
+        pass.setPassword(teacher1.getPassword());
+        passwordRepo.save(pass);
         centerRepo.saveAll(centers);
 
 
-        return "Success";
+        return ResponseEntity.ok("Success");
 
 
     }
 
 
     @PostMapping("/editTeacher")
-    public  String editTeacher(@RequestBody TeacherData teacher1){
+    public  ResponseEntity<String> editTeacher(@RequestBody TeacherData teacher1){
 
-        teacherService.updateTeacher(teacher1.getId(), teacher1);
+       return teacherService.updateTeacher(teacher1.getId(), teacher1);
 
 
-        return "Success";
 
 
     }

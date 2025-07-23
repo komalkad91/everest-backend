@@ -24,7 +24,7 @@ public class TeacherService implements TeacherImpl {
     CenterRepo centerRepo;
 
     @Override
-    public ResponseEntity<Object> updateTeacher(Long id, TeacherData teacher1) {
+    public ResponseEntity<String> updateTeacher(Long id, TeacherData teacher1) {
 
         Teacher teacher = repo.findById(id).get();
 
@@ -51,7 +51,10 @@ public class TeacherService implements TeacherImpl {
         }
 
         if(teacher1.getTeacherCode() != null){
-            teacher.setCode(teacher.getCode());
+            if(teacher1.getTeacherCode() != teacher.getCode()){
+                return ResponseEntity.badRequest().body("Teacher code already exists");
+            }
+            teacher.setCode(teacher1.getTeacherCode());
         }
 
         if(teacher1.getQualification()!= null){

@@ -10,4 +10,6 @@ public interface RequestRepo extends JpaRepository<Request,Long> {
     List<Request> findByTeacherId(Long teacherId);
 
     List<Request> findAll();
+
+
 }

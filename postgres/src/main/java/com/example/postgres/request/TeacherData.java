@@ -28,6 +28,8 @@ public class TeacherData {
     private List<String> centers;
     private List<String> removedCenters;
     private Long teacherCode;
+    private String password;
+    private Long studentCount;
 
 
 }
