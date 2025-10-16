@@ -71,9 +71,16 @@ public class StudentController {
                 student1.setCenter(teacher.getCentersList().get(0));
             }
 
+            if(studentData.getLevel()==null){
+                studentRepo.save(student1);
+                return;
+            }
+
             int level = studentData.getLevel();
             Integer marks = studentData.getMarks();
             LevelMarks lm = existingStudent.getLevelMarks();
+
+
             if (lm == null) {
                 lm = new LevelMarks();
                 lm.setStudent(existingStudent);
@@ -117,10 +124,16 @@ public class StudentController {
                     .type(studentData.getType())
                     .build();
 
+//            if(studentData.getLevel()==null || studentData.getLevelMarks()==null){
+//                studentRepo.save(student1);
+//                return;
+//            }
+
             int level = studentData.getLevel();
             Integer marks = studentData.getMarks();
             LevelMarks lm = new LevelMarks();
             lm.setStudent(student1);
+
             if (marks != null && marks > 80) {
                 switch (level) {
                     case 1: lm.setL_f(marks); break;

@@ -75,7 +75,7 @@ public class TeacherController {
         repo.save(teacher);
     }
 
-    @PostMapping("/createPassword")
+    @GetMapping("/createPassword")
     @CrossOrigin({"http://localhost:3000", "https://everst-abacus.cloudjiffy.net/"})
     public ResponseEntity<String> createPassword() throws DataNotFound{
 

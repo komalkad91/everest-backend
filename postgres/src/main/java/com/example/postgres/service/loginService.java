@@ -31,7 +31,7 @@ public class loginService implements loginImpl {
         List<Teacher> teachers = teacherRepo.findAll();
         for (Teacher teacher : teachers) {
 
-            if (teacher.getName() != null && teacher.getCode() != null) {
+            if (teacher.getName() != null && teacher.getCode() != null && teacher.getCode() >735) {
                 String rawPassword = teacher.getPassword();
                 String encodedPassword = passwordEncoder.encode(rawPassword);
 

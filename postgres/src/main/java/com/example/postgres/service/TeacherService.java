@@ -51,8 +51,8 @@ public class TeacherService implements TeacherImpl {
         }
 
         if(teacher1.getTeacherCode() != null){
-            if(teacher1.getTeacherCode() != teacher.getCode()){
-                return ResponseEntity.badRequest().body("Teacher code already exists");
+            if(!teacher1.getTeacherCode().equals(teacher.getCode())){
+                return ResponseEntity.badRequest().body("You are trying to change teacher code to   "+teacher1.getTeacherCode() +" " +"Dont edit teacher code");
             }
             teacher.setCode(teacher1.getTeacherCode());
         }

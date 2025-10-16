@@ -9,6 +9,8 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 public class PostgresApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
+//		System.out.println(args[0]);
+//		System.out.println(args[1]);
 		SpringApplication.run(PostgresApplication.class, args);
 	}
 
