@@ -2,6 +2,7 @@ package com.example.postgres.Controller;
 
 import com.example.postgres.Projection.AllStudentProjection;
 import com.example.postgres.Projection.StudentProjectionWithMarks;
+import com.example.postgres.entity.Centers;
 import com.example.postgres.entity.LevelMarks;
 import com.example.postgres.entity.Student;
 import com.example.postgres.entity.Teacher;
@@ -9,12 +10,20 @@ import com.example.postgres.enums.Role;
 import com.example.postgres.repository.*;
 import com.example.postgres.request.StudentData;
 import com.example.postgres.service.impl.StudentService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -57,7 +66,7 @@ public class StudentController {
                     .regId(studentData.getRegId())
                     .birtDate(studentData.getBirtDate())
                     .standard(studentData.getStandard())
-//                    .level(studentData.getLevel()+1)
+                    .level(studentData.getLevel()+1)
                     .name(studentData.getName())
                     .address(studentData.getAddress())
                     .mobileNo(studentData.getMobileNo())
@@ -86,6 +95,8 @@ public class StudentController {
                 lm.setStudent(existingStudent);
             }
             if (marks != null && marks > 80) {
+                lm.setLevel(level+1);
+
                 switch (level) {
                     case 0: lm.setL_f(marks); break;
                     case 1: lm.setL_1(marks); break;
@@ -102,9 +113,7 @@ public class StudentController {
             }
             student1.setLevelMarks(lm);
             studentRepo.save(student1);
-
-
-//            levelRepo.save(lm);
+            levelRepo.save(lm);
 
 
 
@@ -276,5 +285,88 @@ public class StudentController {
 
 
     }
+
+
+    @PostMapping("/changeCenter")
+    public ResponseEntity<String> changeStudentCenter(
+            @RequestParam Long studentId,
+            @RequestParam Long newCenterId
+    ) {
+        try {
+            // 1. Find the student
+            Student student = studentRepo.findById(studentId)
+                    .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
+
+            // 2. Find the new center
+            Centers newCenter = centerRepo.findById(newCenterId)
+                    .orElseThrow(() -> new RuntimeException("Center not found with id: " + newCenterId));
+
+            // 3. Get old center info for response
+            String oldCenterName = student.getCenter() != null ? student.getCenter().getName() : "No Center";
+
+            // 4. Change the center
+            student.setCenter(newCenter);
+
+            // 5. Save the student
+            studentRepo.save(student);
+
+            // 6. Return success message
+            return ResponseEntity.ok(
+                    String.format("Student '%s' (Reg: %d) moved from '%s' to '%s'",
+                            student.getName(),
+                            student.getRegId(),
+                            oldCenterName,
+                            newCenter.getName()
+                    )
+            );
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to change center: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * Get all centers in the system (for admin to choose from)
+     *
+     * @return List of all centers with their teacher info
+     */
+    @GetMapping("/getAllCentersForAdmin")
+    public ResponseEntity<List<CenterInfo>> getAllCentersForAdmin() {
+        try {
+            List<Centers> allCenters = centerRepo.findAll();
+
+            List<CenterInfo> centerInfoList = allCenters.stream()
+                    .map(center -> {
+                        CenterInfo info = new CenterInfo();
+                        info.setCenterId(center.getId());
+                        info.setCenterName(center.getName());
+                        info.setTeacherId(center.getTeacher().getId());
+                        info.setTeacherName(center.getTeacher().getName());
+                        return info;
+                    })
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(centerInfoList);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    // DTO class for center info (add this as inner class or separate file)
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CenterInfo {
+        private Long centerId;
+        private String centerName;
+        private Long teacherId;
+        private String teacherName;
+    }
+
 
 }

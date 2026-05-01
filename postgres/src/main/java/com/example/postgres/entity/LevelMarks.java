@@ -23,7 +23,8 @@ public class LevelMarks {
 
     private Integer marks;
 
-    private Integer l_f;
+    @Column(name="f")
+    Integer l_f;
 
     private Integer l_1;
 
@@ -40,6 +41,10 @@ public class LevelMarks {
     private Integer l_7;
 
     private Integer l_8;
+
+    Integer l_9;
+
+    Integer l_10;
 
 
     @OneToOne
