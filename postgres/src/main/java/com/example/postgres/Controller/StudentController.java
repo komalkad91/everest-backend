@@ -73,10 +73,11 @@ public class StudentController {
                     .orElseThrow(() -> new RuntimeException("Student not found"));
 
 
-            // FIX: Handle NULL level safely
+            // FIX: Handle NULL level safely AND cap at 10 (last level)
             Integer nextLevel = null;
             if (studentData.getLevel() != null && studentData.getMarks()!=null && studentData.getMarks()>80) {
-                nextLevel = studentData.getLevel() + 1;
+                // Cap at 10 - don't go beyond level 10
+                nextLevel = studentData.getLevel() >= 10 ? 10 : studentData.getLevel() + 1;
             }else if(studentData.getLevel()!=null){
                 nextLevel = studentData.getLevel();
             }
@@ -111,13 +112,21 @@ public class StudentController {
             Integer marks = studentData.getMarks();
             LevelMarks lm = existingStudent.getLevelMarks();
 
-           //this condition is additional
+            // Try to find existing LevelMarks by student_id (in case relationship is broken)
+            if (lm == null) {
+                // Look up by student to avoid duplicate key error
+                lm = levelRepo.findByStudentId(existingStudent.getId()).orElse(null);
+            }
+
+            // If still null, create new one
             if (lm == null) {
                 lm = new LevelMarks();
                 lm.setStudent(existingStudent);
             }
             if (marks != null && marks > 80) {
-                lm.setLevel(level+1);
+                // Cap at 10 - don't go beyond level 10
+                int newLevel = level >= 10 ? 10 : level + 1;
+                lm.setLevel(newLevel);
 
                 switch (level) {
                     case 0: lm.setL_f(marks); break;
@@ -133,8 +142,8 @@ public class StudentController {
                     case 10: lm.setL_10(marks); break;
                     default: break;
                 }
-                // Update student's level to match LevelMarks level
-                student1.setLevel(level + 1);
+                // Update student's level to match LevelMarks level (capped at 10)
+                student1.setLevel(newLevel);
             }
             student1.setLevelMarks(lm);
             studentRepo.save(student1);
@@ -539,24 +548,36 @@ public class StudentController {
      * GET /api/student/certificate/{studentId}
      */
     @GetMapping("/certificate/{studentId}")
-    public ResponseEntity<byte[]> downloadCertificate(@PathVariable Long studentId) {
+    public ResponseEntity<?> downloadCertificate(
+            @PathVariable Long studentId,
+            @RequestParam(value = "level", required = false) Integer requestedLevel) {
         try {
-            System.out.println("Certificate request for student ID: " + studentId);
+            System.out.println("Certificate request for student ID: " + studentId + ", level: " + requestedLevel);
             
             Student student = studentRepo.findById(studentId)
                     .orElseThrow(() -> new RuntimeException("Student not found"));
             
             System.out.println("Found student: " + student.getName());
 
-            Integer level = student.getLevel();
-            System.out.println("Student level: " + level);
+            // Use requested level if provided, otherwise use student's current level
+            Integer level = requestedLevel != null ? requestedLevel : student.getLevel();
+            System.out.println("Certificate level: " + level);
+
+            // Validate: Only levels 1-9 have certificate templates
+            if (level == null || level == 0 || level == 10) {
+                String errorMsg = "Certificate template for Level " + level + " is not available. Only Levels 1-9 have certificates.";
+                System.err.println(errorMsg);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .body(errorMsg);
+            }
             
             String levelText = certificateService.getLevelText(level);
             System.out.println("Level text: " + levelText);
 
             Integer marks = 0;
             if (student.getLevelMarks() != null) {
-                marks = getMarksForLevel(student.getLevelMarks(), level - 1);
+                marks = getMarksForLevel(student.getLevelMarks(), level );
             }
             System.out.println("Marks: " + marks);
 
@@ -567,11 +588,16 @@ public class StudentController {
             }
             System.out.println("Teacher name: " + teacherName);
 
+            // Get registration ID
+            String regId = student.getRegId() != null ? String.valueOf(student.getRegId()) : "";
+            System.out.println("Reg ID: " + regId);
+
             byte[] pdfBytes = certificateService.generateCertificate(
                     student.getName(),
                     levelText,
                     marks,
-                    teacherName
+                    teacherName,
+                    regId
             );
             
             System.out.println("PDF generated successfully, size: " + pdfBytes.length);
@@ -580,7 +606,7 @@ public class StudentController {
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData(
                     "attachment",
-                    "Certificate_" + student.getName().replace(" ", "_") + ".pdf"
+                    "Certificate_" + student.getName().replace(" ", "_") + "_Level" + level + ".pdf"
             );
 
             return ResponseEntity.ok()
@@ -590,7 +616,9 @@ public class StudentController {
         } catch (Exception e) {
             System.err.println("Error generating certificate: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body("Failed to generate certificate: " + e.getMessage());
         }
     }
 

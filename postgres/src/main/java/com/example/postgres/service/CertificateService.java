@@ -25,7 +25,7 @@ public class CertificateService {
 
     private static final String TEMPLATE_PATH = "src/main/resources/certificates/1st.pdf";
 
-    public byte[] generateCertificate(String studentName, String level, Integer marks, String teacherName) {
+    public byte[] generateCertificate(String studentName, String level, Integer marks, String teacherName, String regId) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -46,13 +46,26 @@ public class CertificateService {
             // Use Times Italic font - more italic than Helvetica
             PdfFont regularFont = PdfFontFactory.createFont(StandardFonts.TIMES_ITALIC);
 
+            // Get level-specific Y coordinates (some templates need different positioning)
+            int certifyY = getCertifyY(level);
+            int mainParaY = getMainParaY(level);
+
+            // Registration Number - TOP LEFT (extreme top)
+            Paragraph regIdPara = new Paragraph("Reg No: " + regId)
+                    .setFont(regularFont)
+                    .setFontSize(10)
+                    .setFontColor(new DeviceRgb(0, 0, 0))
+                    .setTextAlignment(TextAlignment.LEFT)
+                    .setFixedPosition(20, 580, 200);
+            canvas.add(regIdPara);
+
             // Line 1: "This is to certify that," - CENTERED
             Paragraph certifyText = new Paragraph("This is to certify that,")
                     .setFont(regularFont)
                     .setFontSize(18)
                     .setFontColor(new DeviceRgb(0, 0, 0))
                     .setTextAlignment(TextAlignment.CENTER)
-                    .setFixedPosition(50, 310, 495);
+                    .setFixedPosition(50, certifyY, 495);
             canvas.add(certifyText);
 
             // Main paragraph: Name in RED + flowing text - JUSTIFIED (fills line completely)
@@ -64,13 +77,12 @@ public class CertificateService {
                             .setFont(regularFont).setFontColor(new DeviceRgb(0, 0, 0)))
                     .setFontSize(18)
                     .setTextAlignment(TextAlignment.JUSTIFIED)
-                    .setFixedPosition(72, 160, 650)
+                    .setFixedPosition(72, mainParaY, 650)
                     .setHeight(140);
             canvas.add(mainParagraph);
 
-            // Date - left side
-            String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("d/M/yyyy"));
-            Paragraph datePara = new Paragraph("Date - " + currentDate)
+            // Date - left side (BLANK - no current date)
+            Paragraph datePara = new Paragraph("Date - ")
                     .setFont(regularFont)
                     .setFontSize(13)
                     .setFontColor(new DeviceRgb(0, 0, 0))
@@ -116,6 +128,36 @@ public class CertificateService {
             return levels[levelNumber];
         }
         return "First";
+    }
+
+    /**
+     * Get the Y coordinate for "This is to certify that," text based on level
+     * Some templates need different positioning
+     */
+    private int getCertifyY(String level) {
+        switch (level) {
+            case "Fifth":
+                return 260;  // Lower position for 5th level template
+            case "Eighth":
+                return 360;  // Higher position for 8th level template
+            default:
+                return 310;  // Default position
+        }
+    }
+
+    /**
+     * Get the Y coordinate for main paragraph based on level
+     * Some templates need different positioning
+     */
+    private int getMainParaY(String level) {
+        switch (level) {
+            case "Fifth":
+                return 110;  // Lower position for 5th level template
+            case "Eighth":
+                return 210;  // Higher position for 8th level template
+            default:
+                return 160;  // Default position
+        }
     }
 
     /**
